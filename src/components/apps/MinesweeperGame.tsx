@@ -1,39 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { RotateCcw, Flag, Trophy, Bomb } from 'lucide-react';
-
-type Difficulty = 'easy' | 'medium' | 'hard';
-type CellState = 'hidden' | 'revealed' | 'flagged';
-type GameStatus = 'idle' | 'playing' | 'won' | 'lost';
-
-interface Cell {
-    isMine: boolean;
-    neighborMines: number;
-    state: CellState;
-}
-
-interface DifficultyConfig {
-    rows: number;
-    cols: number;
-    mines: number;
-}
-
-const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
-    easy: { rows: 9, cols: 9, mines: 10 },
-    medium: { rows: 16, cols: 16, mines: 40 },
-    hard: { rows: 16, cols: 30, mines: 99 },
-};
-
-const NUMBER_COLORS = [
-    '',
-    'text-blue-600',
-    'text-green-600',
-    'text-red-600',
-    'text-purple-600',
-    'text-yellow-700',
-    'text-pink-600',
-    'text-gray-800',
-    'text-gray-900',
-];
+import { MinesweeperGrid } from './MinesweeperGrid';
+import { Difficulty, Cell, GameStatus, DIFFICULTIES } from './MinesweeperTypes';
 
 export const MinesweeperGame = () => {
     const [difficulty, setDifficulty] = useState<Difficulty>('easy');
@@ -295,47 +263,14 @@ export const MinesweeperGame = () => {
 
             {/* Game Grid */}
             <div className="relative bg-white p-4 rounded-lg shadow-2xl">
-                <div
-                    className="grid gap-[1px] bg-gray-400 border-4 border-gray-600"
-                    style={{
-                        gridTemplateColumns: `repeat(${config.cols}, minmax(0, 1fr))`,
-                    }}
-                >
-                    {grid.map((row, rowIndex) =>
-                        row.map((cell, colIndex) => (
-                            <button
-                                key={`${rowIndex}-${colIndex}`}
-                                onClick={() => handleLeftClick(rowIndex, colIndex)}
-                                onContextMenu={(e) => handleRightClick(e, rowIndex, colIndex)}
-                                className={`
-                                    ${cellSize}
-                                    flex items-center justify-center font-bold
-                                    transition-all
-                                    ${cell.state === 'hidden'
-                                        ? 'bg-gray-500 hover:bg-gray-400 shadow-inner'
-                                        : cell.state === 'flagged'
-                                            ? 'bg-gray-500'
-                                            : cell.isMine
-                                                ? 'bg-red-500'
-                                                : 'bg-gray-200'
-                                    }
-                                `}
-                            >
-                                {cell.state === 'flagged' && (
-                                    <Flag className="text-ubuntu-orange" size={difficulty === 'hard' ? 12 : 16} />
-                                )}
-                                {cell.state === 'revealed' && cell.isMine && (
-                                    <Bomb className="text-white" size={difficulty === 'hard' ? 12 : 16} />
-                                )}
-                                {cell.state === 'revealed' && !cell.isMine && cell.neighborMines > 0 && (
-                                    <span className={NUMBER_COLORS[cell.neighborMines]}>
-                                        {cell.neighborMines}
-                                    </span>
-                                )}
-                            </button>
-                        ))
-                    )}
-                </div>
+                <MinesweeperGrid
+                    grid={grid}
+                    config={config}
+                    handleLeftClick={handleLeftClick}
+                    handleRightClick={handleRightClick}
+                    cellSize={cellSize}
+                    difficulty={difficulty}
+                />
 
                 {/* Game Over Overlay */}
                 {(gameStatus === 'won' || gameStatus === 'lost') && (
