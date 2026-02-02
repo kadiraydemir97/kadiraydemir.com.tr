@@ -113,6 +113,38 @@ docker-compose up -d --build
 
 ---
 
+## ⚡ Option 2: Automated Deployment (GitHub Actions)
+
+Instead of manually connecting to the server, you can set up **GitHub Actions** to deploy automatically whenever you push to the repository.
+
+### 1. Configure GitHub Secrets
+Go to your GitHub Repository -> **Settings** -> **Secrets and variables** -> **Actions** -> **New repository secret**.
+
+Add the following secrets:
+- `SERVER_HOST`: Your server's IP address (e.g., `192.168.1.1`)
+- `SERVER_USER`: Your server username (e.g., `root` or `ubuntu`)
+- `SSH_PRIVATE_KEY`: Your private SSH key content (copy from `~/.ssh/id_rsa` or generate a new pair)
+
+### 2. Push to Deploy
+I have created `.github/workflows/deploy.yml` for you. Now, every time you push to the `main` branch, GitHub will automatically log in to your server, pull the changes, and restart the containers.
+
+You can also trigger it manually from the **actions** tab on GitHub.
+
+---
+
+## 🖥️ Option 3: Visual Interface (Portainer)
+
+If you want a **Visual Interface (GUI)** to manage your containers, logs, and updates without using the terminal, I recommend **Portainer**.
+
+**Install Portainer on your server:**
+```bash
+docker volume create portainer_data
+docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+```
+Then access `https://<YOUR-SERVER-IP>:9443` to manage your stacks and containers visually.
+
+---
+
 ## 🗑️ Reset / Uninstall
 
 To remove everything and start fresh:
