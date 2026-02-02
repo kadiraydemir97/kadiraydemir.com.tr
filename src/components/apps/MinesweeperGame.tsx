@@ -1,27 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { RotateCcw, Flag, Trophy, Bomb } from 'lucide-react';
-
-type Difficulty = 'easy' | 'medium' | 'hard';
-type CellState = 'hidden' | 'revealed' | 'flagged';
-type GameStatus = 'idle' | 'playing' | 'won' | 'lost';
-
-interface Cell {
-    isMine: boolean;
-    neighborMines: number;
-    state: CellState;
-}
-
-interface DifficultyConfig {
-    rows: number;
-    cols: number;
-    mines: number;
-}
-
-const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
-    easy: { rows: 9, cols: 9, mines: 10 },
-    medium: { rows: 16, cols: 16, mines: 40 },
-    hard: { rows: 16, cols: 30, mines: 99 },
-};
+import {
+    Difficulty,
+    Cell,
+    GameStatus,
+    DIFFICULTIES,
+    initializeGrid,
+    placeMines,
+    revealCell,
+    checkWin
+} from '../../utils/minesweeperLogic';
 
 const NUMBER_COLORS = [
     '',
@@ -45,141 +33,30 @@ export const MinesweeperGame = () => {
 
     const config = DIFFICULTIES[difficulty];
 
-    // Initialize empty grid
-    const initializeGrid = useCallback(() => {
-        const newGrid: Cell[][] = [];
-        for (let row = 0; row < config.rows; row++) {
-            newGrid[row] = [];
-            for (let col = 0; col < config.cols; col++) {
-                newGrid[row][col] = {
-                    isMine: false,
-                    neighborMines: 0,
-                    state: 'hidden',
-                };
-            }
-        }
-        return newGrid;
-    }, [config]);
-
-    // Place mines avoiding first click position
-    const placeMines = useCallback((grid: Cell[][], firstRow: number, firstCol: number) => {
-        let minesPlaced = 0;
-        const newGrid = grid.map(row => row.map(cell => ({ ...cell })));
-
-        while (minesPlaced < config.mines) {
-            const row = Math.floor(Math.random() * config.rows);
-            const col = Math.floor(Math.random() * config.cols);
-
-            // Don't place mine on first click or if already has mine
-            if ((row === firstRow && col === firstCol) || newGrid[row][col].isMine) {
-                continue;
-            }
-
-            newGrid[row][col].isMine = true;
-            minesPlaced++;
-        }
-
-        // Calculate neighbor mines
-        for (let row = 0; row < config.rows; row++) {
-            for (let col = 0; col < config.cols; col++) {
-                if (!newGrid[row][col].isMine) {
-                    let count = 0;
-                    for (let dr = -1; dr <= 1; dr++) {
-                        for (let dc = -1; dc <= 1; dc++) {
-                            const newRow = row + dr;
-                            const newCol = col + dc;
-                            if (
-                                newRow >= 0 &&
-                                newRow < config.rows &&
-                                newCol >= 0 &&
-                                newCol < config.cols &&
-                                newGrid[newRow][newCol].isMine
-                            ) {
-                                count++;
-                            }
-                        }
-                    }
-                    newGrid[row][col].neighborMines = count;
-                }
-            }
-        }
-
-        return newGrid;
-    }, [config]);
-
-    // Flood fill for empty cells
-    const revealCell = useCallback((grid: Cell[][], row: number, col: number): Cell[][] => {
-        if (
-            row < 0 ||
-            row >= config.rows ||
-            col < 0 ||
-            col >= config.cols ||
-            grid[row][col].state !== 'hidden'
-        ) {
-            return grid;
-        }
-
-        const newGrid = grid.map(r => r.map(c => ({ ...c })));
-        newGrid[row][col].state = 'revealed';
-
-        // If no neighbor mines, reveal neighbors recursively
-        if (newGrid[row][col].neighborMines === 0 && !newGrid[row][col].isMine) {
-            for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                    if (dr !== 0 || dc !== 0) {
-                        const newRow = row + dr;
-                        const newCol = col + dc;
-                        if (
-                            newRow >= 0 &&
-                            newRow < config.rows &&
-                            newCol >= 0 &&
-                            newCol < config.cols &&
-                            newGrid[newRow][newCol].state === 'hidden'
-                        ) {
-                            return revealCell(newGrid, newRow, newCol);
-                        }
-                    }
-                }
-            }
-        }
-
-        return newGrid;
-    }, [config]);
-
-    // Check win condition
-    const checkWin = useCallback((grid: Cell[][]) => {
-        for (let row = 0; row < config.rows; row++) {
-            for (let col = 0; col < config.cols; col++) {
-                const cell = grid[row][col];
-                if (!cell.isMine && cell.state !== 'revealed') {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }, [config]);
-
     // Handle left click
     const handleLeftClick = useCallback((row: number, col: number) => {
         if (gameStatus === 'won' || gameStatus === 'lost') return;
 
         setGrid(prevGrid => {
-            let newGrid = prevGrid.map(r => r.map(c => ({ ...c })));
+            // Optimization: check flag before doing any heavy lifting
+            if (prevGrid[row][col].state === 'flagged') return prevGrid;
+
+            let currentGrid = prevGrid;
 
             // First click - place mines
             if (firstClick) {
-                newGrid = placeMines(newGrid, row, col);
+                // placeMines returns a new deep copy with mines placed
+                currentGrid = placeMines(currentGrid, row, col, config);
                 setFirstClick(false);
                 setGameStatus('playing');
             }
 
-            const cell = newGrid[row][col];
-
-            if (cell.state === 'flagged') return prevGrid;
+            const cell = currentGrid[row][col];
 
             if (cell.isMine) {
                 // Game over - reveal all mines
-                newGrid = newGrid.map(r =>
+                // Create a new grid for the game over state
+                const newGrid = currentGrid.map(r =>
                     r.map(c => ({
                         ...c,
                         state: c.isMine ? 'revealed' : c.state,
@@ -189,16 +66,17 @@ export const MinesweeperGame = () => {
                 return newGrid;
             }
 
-            newGrid = revealCell(newGrid, row, col);
+            // revealCell returns a new deep copy if changes are made, or the original grid if not
+            const newGrid = revealCell(currentGrid, row, col, config);
 
-            // Check win
-            if (checkWin(newGrid)) {
+            // Check win on the new grid
+            if (checkWin(newGrid, config)) {
                 setGameStatus('won');
             }
 
             return newGrid;
         });
-    }, [gameStatus, firstClick, placeMines, revealCell, checkWin]);
+    }, [gameStatus, firstClick, config]);
 
     // Handle right click (flag)
     const handleRightClick = useCallback((e: React.MouseEvent, row: number, col: number) => {
@@ -206,16 +84,25 @@ export const MinesweeperGame = () => {
         if (gameStatus === 'won' || gameStatus === 'lost') return;
 
         setGrid(prevGrid => {
-            const newGrid = prevGrid.map(r => r.map(c => ({ ...c })));
-            const cell = newGrid[row][col];
-
+            const cell = prevGrid[row][col];
             if (cell.state === 'revealed') return prevGrid;
 
-            if (cell.state === 'hidden') {
-                cell.state = 'flagged';
+            // Shallow copy rows, copy changed cell
+            const newGrid = prevGrid.map((r, rIndex) => {
+                if (rIndex !== row) return r;
+                return r.map((c, cIndex) => {
+                    if (cIndex !== col) return c;
+                    return { ...c };
+                });
+            });
+
+            const newCell = newGrid[row][col];
+
+            if (newCell.state === 'hidden') {
+                newCell.state = 'flagged';
                 setFlagCount(prev => prev + 1);
-            } else if (cell.state === 'flagged') {
-                cell.state = 'hidden';
+            } else if (newCell.state === 'flagged') {
+                newCell.state = 'hidden';
                 setFlagCount(prev => prev - 1);
             }
 
@@ -225,12 +112,12 @@ export const MinesweeperGame = () => {
 
     // Reset game
     const resetGame = useCallback(() => {
-        setGrid(initializeGrid());
+        setGrid(initializeGrid(config.rows, config.cols));
         setGameStatus('idle');
         setTimer(0);
         setFlagCount(0);
         setFirstClick(true);
-    }, [initializeGrid]);
+    }, [config]);
 
     // Timer
     useEffect(() => {
