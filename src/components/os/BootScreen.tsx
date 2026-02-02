@@ -33,7 +33,7 @@ export const BootScreen = () => {
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
-                    <h1 className="text-3xl font-bold tracking-widest text-white">KADIR AYDEMIR</h1>
+                    <h1 className="text-3xl font-bold tracking-widest text-white">CI DEMO</h1>
                     <div className="flex gap-2 mt-4">
                         <div className={`w-3 h-3 rounded-full transition-colors duration-200 ${checkPhase >= 0 ? 'bg-ubuntu-orange' : 'bg-gray-700'}`} />
                         <div className={`w-3 h-3 rounded-full transition-colors duration-200 ${checkPhase >= 1 ? 'bg-ubuntu-orange' : 'bg-gray-700'}`} />
