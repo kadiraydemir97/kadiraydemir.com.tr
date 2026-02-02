@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { RotateCcw, Lightbulb, Eraser, Edit3, Trophy } from 'lucide-react';
 
 type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
@@ -22,6 +22,64 @@ const DIFFICULTIES: Record<Difficulty, number> = {
     hard: 24,
     expert: 28,
 };
+
+interface SudokuBoardProps {
+    grid: Cell[][];
+    selectedCell: [number, number] | null;
+    onCellSelect: (row: number, col: number) => void;
+}
+
+const SudokuBoard = memo(({ grid, selectedCell, onCellSelect }: SudokuBoardProps) => {
+    return (
+        <div className="grid grid-cols-6 gap-0 border-4 border-gray-800">
+            {grid.map((row, rowIndex) =>
+                row.map((cell, colIndex) => {
+                    const isSelected = selectedCell?.[0] === rowIndex && selectedCell?.[1] === colIndex;
+                    const isHighlighted = selectedCell && (
+                        selectedCell[0] === rowIndex ||
+                        selectedCell[1] === colIndex ||
+                        (Math.floor(selectedCell[0] / BOX_ROWS) === Math.floor(rowIndex / BOX_ROWS) &&
+                            Math.floor(selectedCell[1] / BOX_COLS) === Math.floor(colIndex / BOX_COLS))
+                    );
+                    const isSameNumber = cell.value !== null && selectedCell &&
+                        grid[selectedCell[0]][selectedCell[1]].value === cell.value;
+
+                    return (
+                        <button
+                            key={`${rowIndex}-${colIndex}`}
+                            onClick={() => onCellSelect(rowIndex, colIndex)}
+                            className={`
+                                w-16 h-16 flex items-center justify-center relative
+                                border border-gray-300 font-bold text-xl
+                                transition-colors
+                                ${(colIndex + 1) % BOX_COLS === 0 && colIndex !== GRID_SIZE - 1 ? 'border-r-2 border-r-gray-800' : ''}
+                                ${(rowIndex + 1) % BOX_ROWS === 0 && rowIndex !== GRID_SIZE - 1 ? 'border-b-2 border-b-gray-800' : ''}
+                                ${isSelected ? 'bg-ubuntu-orange/30 ring-2 ring-ubuntu-orange' : ''}
+                                ${isHighlighted && !isSelected ? 'bg-blue-100' : ''}
+                                ${isSameNumber && !isSelected ? 'bg-blue-200' : ''}
+                                ${!isSelected && !isHighlighted && !isSameNumber ? 'bg-white hover:bg-gray-100' : ''}
+                                ${cell.isFixed ? 'text-gray-900' : 'text-ubuntu-orange'}
+                                ${cell.isError ? 'bg-red-100 text-red-600' : ''}
+                            `}
+                        >
+                            {cell.value !== null ? (
+                                cell.value
+                            ) : (
+                                <div className="grid grid-cols-3 gap-0 text-[10px] text-gray-400 absolute inset-0 p-1">
+                                    {[1, 2, 3, 4, 5, 6].map(num => (
+                                        <div key={num} className="flex items-center justify-center">
+                                            {cell.notes.has(num) ? num : ''}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </button>
+                    );
+                })
+            )}
+        </div>
+    );
+});
 
 export const SudokuGame = () => {
     const [difficulty, setDifficulty] = useState<Difficulty>('medium');
@@ -225,6 +283,10 @@ export const SudokuGame = () => {
         });
     }, [selectedCell, solution, isComplete]);
 
+    const handleCellSelect = useCallback((row: number, col: number) => {
+        setSelectedCell([row, col]);
+    }, []);
+
     // Timer
     useEffect(() => {
         if (!isComplete) {
@@ -301,53 +363,11 @@ export const SudokuGame = () => {
 
             {/* Game Grid */}
             <div className="relative bg-white p-4 rounded-lg shadow-2xl mb-4">
-                <div className="grid grid-cols-6 gap-0 border-4 border-gray-800">
-                    {grid.map((row, rowIndex) =>
-                        row.map((cell, colIndex) => {
-                            const isSelected = selectedCell?.[0] === rowIndex && selectedCell?.[1] === colIndex;
-                            const isHighlighted = selectedCell && (
-                                selectedCell[0] === rowIndex ||
-                                selectedCell[1] === colIndex ||
-                                (Math.floor(selectedCell[0] / BOX_ROWS) === Math.floor(rowIndex / BOX_ROWS) &&
-                                    Math.floor(selectedCell[1] / BOX_COLS) === Math.floor(colIndex / BOX_COLS))
-                            );
-                            const isSameNumber = cell.value !== null && selectedCell &&
-                                grid[selectedCell[0]][selectedCell[1]].value === cell.value;
-
-                            return (
-                                <button
-                                    key={`${rowIndex}-${colIndex}`}
-                                    onClick={() => setSelectedCell([rowIndex, colIndex])}
-                                    className={`
-                                        w-16 h-16 flex items-center justify-center relative
-                                        border border-gray-300 font-bold text-xl
-                                        transition-colors
-                                        ${(colIndex + 1) % BOX_COLS === 0 && colIndex !== GRID_SIZE - 1 ? 'border-r-2 border-r-gray-800' : ''}
-                                        ${(rowIndex + 1) % BOX_ROWS === 0 && rowIndex !== GRID_SIZE - 1 ? 'border-b-2 border-b-gray-800' : ''}
-                                        ${isSelected ? 'bg-ubuntu-orange/30 ring-2 ring-ubuntu-orange' : ''}
-                                        ${isHighlighted && !isSelected ? 'bg-blue-100' : ''}
-                                        ${isSameNumber && !isSelected ? 'bg-blue-200' : ''}
-                                        ${!isSelected && !isHighlighted && !isSameNumber ? 'bg-white hover:bg-gray-100' : ''}
-                                        ${cell.isFixed ? 'text-gray-900' : 'text-ubuntu-orange'}
-                                        ${cell.isError ? 'bg-red-100 text-red-600' : ''}
-                                    `}
-                                >
-                                    {cell.value !== null ? (
-                                        cell.value
-                                    ) : (
-                                        <div className="grid grid-cols-3 gap-0 text-[10px] text-gray-400 absolute inset-0 p-1">
-                                            {[1, 2, 3, 4, 5, 6].map(num => (
-                                                <div key={num} className="flex items-center justify-center">
-                                                    {cell.notes.has(num) ? num : ''}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </button>
-                            );
-                        })
-                    )}
-                </div>
+                <SudokuBoard
+                    grid={grid}
+                    selectedCell={selectedCell}
+                    onCellSelect={handleCellSelect}
+                />
 
                 {/* Win Overlay */}
                 {isComplete && (
