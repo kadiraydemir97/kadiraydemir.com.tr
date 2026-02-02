@@ -64,7 +64,7 @@ export const MinesweeperGame = () => {
     // Place mines avoiding first click position
     const placeMines = useCallback((grid: Cell[][], firstRow: number, firstCol: number) => {
         let minesPlaced = 0;
-        const newGrid = grid.map(row => row.map(cell => ({ ...cell })));
+        const newGrid = grid;
 
         while (minesPlaced < config.mines) {
             const row = Math.floor(Math.random() * config.rows);
