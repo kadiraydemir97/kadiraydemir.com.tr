@@ -1,160 +1,70 @@
-# 🚀 Ubuntu Deployment Guide (Docker + Nginx Proxy)
+# 🚀 Ubuntu Deployment Guide (Coolify)
 
-This guide details how to deploy your React + Vite project using **Docker** and **Nginx Reverse Proxy**. This is the most professional and flexible way to host modern web apps.
-
-## Prerequisites
-- **Ubuntu Server** (20.04 or 22.04 LTS recommended)
-- **Root/Sudo Access** via SSH
-- **Domain Name** (points to server IP)
+This guide details how to deploy your project using **Coolify**. Coolify is an open-source, self-hosted Heroku/Netlify alternative that automates Docker, Reverse Proxy (Traefik/Caddy), and SSL (Let's Encrypt) for you.
 
 ---
 
-## Step 1: System Prep & Docker Installation
+## 🛠️ Step 1: Install Docker
 
-Connect to your server and install Docker.
+If Docker is not already installed on your server, run the following commands:
 
 ```bash
-# Update System
-sudo apt update && sudo apt upgrade -y
+# Update package index
+sudo apt-get update
 
-# Install Docker & Compose
-sudo apt install docker.io docker-compose -y
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
 
-# Install Nginx & Certbot (For SSL Proxy)
-sudo apt install nginx certbot python3-certbot-nginx -y
-
-# Add user to docker group (avoid sudo for docker commands)
-sudo usermod -aG docker $USER
-# NOTE: Logout and login again for this to take effect!
+# Install Docker Compose (if needed)
+sudo apt-get install docker-compose-plugin -y
 ```
+
+## 🚀 Step 2: Install Coolify
+
+Connect to your server via SSH and run the official installation script. This script will install Docker (if missing) and set up the Coolify dashboard.
+
+```bash
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
+```
+
+Once installed, access your dashboard at:  
+`http://<YOUR-SERVER-IP>:8000`
 
 ---
 
-## Step 2: Clone & Run Project (Docker)
+## 📦 Step 3: Deploying the Application
 
-We will run the application inside a container on port `3000`.
-
-```bash
-# Go to web directory
-cd /var/www
-
-# Clone Repo
-git clone https://github.com/kadiraydemir97/kadiraydemir.com.tr.git
-cd kadiraydemir.com.tr
-
-# Start the Container
-# This builds the app and starts it on localhost:3000
-docker-compose up -d --build
-```
-
-**Check if running:** `curl localhost:3000` (Should return HTML).
+1.  **Login:** Create your admin account on the Coolify dashboard.
+2.  **Connect GitHub:**
+    *   Go to **Sources** -> **GitHub App**.
+    *   Follow the instructions to link your GitHub account.
+3.  **Create New Resource:**
+    *   Go to **Projects** -> **Default** (or create new).
+    *   Click **+ New Resource** -> **Public Repository** or **Private Repository**.
+    *   Select your repository: `kadiraydemir97/kadiraydemir.com.tr`.
+4.  **Configuration:**
+    *   **Build Pack:** Select `Docker Compose` or `Nginx` (Coolify will detect the `Dockerfile` or `docker-compose.yml`).
+    *   **Domains:** Enter `https://kadiraydemir.com.tr`. Coolify will automatically generate the SSL certificate and configure the reverse proxy.
+5.  **Deploy:** Click **Deploy**.
 
 ---
 
-## Step 3: Configure Nginx (Reverse Proxy)
+## 🔄 Automatic CI/CD
 
-Now we tell the main Nginx server to forward traffic from the internet to your Docker container.
-
-```bash
-sudo nano /etc/nginx/sites-available/kadiraydemir.com.tr
-```
-
-**Paste this config:**
-
-```nginx
-server {
-    listen 80;
-    server_name kadiraydemir.com.tr www.kadiraydemir.com.tr;
-
-    location / {
-        # Forward traffic to Docker container
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-**Enable Site & Restart:**
-
-```bash
-sudo ln -s /etc/nginx/sites-available/kadiraydemir.com.tr /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl restart nginx
-```
+Coolify automatically sets up a **Webhook**.  
+Every time you `git push` to your `main` branch, Coolify will:
+*   Pull the latest code.
+*   Build the Docker image.
+*   Deploy it with zero downtime.
+*   Keep your SSL certificates updated.
 
 ---
 
-## Step 4: SSL Setup (HTTPS)
+## 🖥️ Management
 
-Secure your site with a free certificate.
+*   **Logs:** You can view real-time build and application logs directly in the Coolify UI.
+*   **Health Checks:** Coolify monitors your container and restarts it if it crashes.
+*   **Backups:** You can easily add database backups or S3 integrations for persistent data.
 
-```bash
-sudo certbot --nginx -d kadiraydemir.com.tr -d www.kadiraydemir.com.tr
-```
 
-Follow the prompts. Certbot will automatically configure HTTPS redirect.
-
----
-
-## 🔄 Updating the Site
-
-When you push new code to GitHub:
-
-```bash
-cd /var/www/kadiraydemir.com.tr
-git pull
-docker-compose up -d --build
-```
-*Docker will rebuild the image with new code and restart the container seamlessly.*
-
----
-
-## ⚡ Option 2: Automated Deployment (GitHub Actions)
-
-Instead of manually connecting to the server, you can set up **GitHub Actions** to deploy automatically whenever you push to the repository.
-
-### 1. Configure GitHub Secrets
-Go to your GitHub Repository -> **Settings** -> **Secrets and variables** -> **Actions** -> **New repository secret**.
-
-Add the following secrets:
-- `SERVER_HOST`: Your server's IP address (e.g., `192.168.1.1`)
-- `SERVER_USER`: Your server username (e.g., `root` or `ubuntu`)
-- `SSH_PRIVATE_KEY`: Your private SSH key content (copy from `~/.ssh/id_rsa` or generate a new pair)
-
-### 2. Push to Deploy
-I have created `.github/workflows/deploy.yml` for you. Now, every time you push to the `main` branch, GitHub will automatically log in to your server, pull the changes, and restart the containers.
-
-You can also trigger it manually from the **actions** tab on GitHub.
-
----
-
-## 🖥️ Option 3: Visual Interface (Portainer)
-
-If you want a **Visual Interface (GUI)** to manage your containers, logs, and updates without using the terminal, I recommend **Portainer**.
-
-**Install Portainer on your server:**
-```bash
-docker volume create portainer_data
-docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
-```
-Then access `https://<YOUR-SERVER-IP>:9443` to manage your stacks and containers visually.
-
----
-
-## 🗑️ Reset / Uninstall
-
-To remove everything and start fresh:
-
-```bash
-docker-compose down
-sudo systemctl stop nginx
-sudo rm -rf /var/www/kadiraydemir.com.tr
-sudo rm /etc/nginx/sites-available/kadiraydemir.com.tr
-sudo rm /etc/nginx/sites-enabled/kadiraydemir.com.tr
-sudo certbot delete --cert-name kadiraydemir.com.tr
-sudo systemctl start nginx
-```
