@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Linkedin, MapPin, ExternalLink, Briefcase } from 'lucide-react';
+import profileImage from '../../assets/profile.jpg';
 
 interface LinkedInBadgeProps {
     refreshKey: number;
@@ -65,48 +66,63 @@ export const LinkedInBadge: React.FC<LinkedInBadgeProps> = ({ refreshKey }) => {
     if (showFallback) {
         return (
             <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500 w-full py-4 px-4">
-                <div className="bg-white w-full max-w-[360px] rounded-2xl shadow-xl overflow-hidden border border-gray-100 font-sans">
-                    <div className="h-20 bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex justify-end">
-                        <Linkedin className="text-white/20 w-12 h-12" />
+                <div className="bg-white w-full max-w-[360px] rounded-2xl shadow-2xl overflow-hidden border border-gray-100 font-sans flex flex-col">
+                    {/* Header Banner */}
+                    <div className="h-24 bg-gradient-to-r from-blue-700 to-blue-900 relative shrink-0">
+                        <Linkedin className="absolute top-4 right-4 text-white/20 w-10 h-10" />
                     </div>
-                    <div className="px-6 pb-6 relative">
-                        <div className="absolute -top-10 left-6">
-                            <div className="w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-white shadow-md">
+
+                    {/* Content Area */}
+                    <div className="px-6 pb-8 flex flex-col items-start relative bg-white">
+                        {/* Avatar - Positioned to overlap banner */}
+                        <div className="relative -mt-12 mb-4 z-20">
+                            <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
                                 <img
-                                    src="https://media.licdn.com/dms/image/v2/D4D03AQGsR65sXw8Z4Q/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1715504825651?e=1743638400&v=beta&t=9xVnC1v_lY-o7e9Ue2ZlM0m_u1yv_L9kZ7n3Q1q9Z9M"
+                                    src={profileImage}
                                     alt="Kadir Aydemir"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover object-top"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=Kadir+Aydemir&background=0a66c2&color=fff&size=200`;
+                                    }}
                                 />
                             </div>
                         </div>
-                        <div className="mt-12">
-                            <h3 className="text-xl font-bold text-gray-900">Kadir Aydemir</h3>
-                            <p className="text-sm text-gray-600 font-medium">Senior Full Stack Developer | Technical Lead</p>
 
-                            <div className="mt-4 space-y-2">
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
-                                    <Briefcase size={14} className="text-gray-400" />
-                                    <span>Akbank · Senior Software Developer</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
-                                    <MapPin size={14} className="text-gray-400" />
-                                    <span>Ankara, Türkiye</span>
-                                </div>
-                            </div>
-
-                            <a
-                                href="https://tr.linkedin.com/in/kadir-aydemir-3a1a55148"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-6 flex items-center justify-center gap-2 w-full py-2 bg-[#0a66c2] text-white rounded-full text-sm font-bold hover:bg-[#004182] transition-colors shadow-md shadow-blue-200"
-                            >
-                                Profili Görüntüle
-                                <ExternalLink size={14} />
-                            </a>
+                        {/* Name & Title */}
+                        <div className="space-y-1 w-full">
+                            <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight leading-none">Kadir Aydemir</h3>
+                            <p className="text-sm text-blue-700 font-bold uppercase tracking-wider">Senior Full Stack Developer</p>
                         </div>
+
+                        {/* Details List */}
+                        <div className="mt-6 space-y-3 w-full border-t border-gray-50 pt-6">
+                            <div className="flex items-center gap-3 text-sm text-gray-600">
+                                <div className="bg-gray-100 p-2 rounded-lg">
+                                    <Briefcase size={16} className="text-gray-500" />
+                                </div>
+                                <span className="font-medium">Akbank · Senior Developer</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-gray-600">
+                                <div className="bg-gray-100 p-2 rounded-lg">
+                                    <MapPin size={16} className="text-gray-500" />
+                                </div>
+                                <span className="font-medium">Ankara, Türkiye</span>
+                            </div>
+                        </div>
+
+                        {/* Button */}
+                        <a
+                            href="https://tr.linkedin.com/in/kadir-aydemir-3a1a55148"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-8 flex items-center justify-center gap-2 w-full py-3 bg-[#0a66c2] text-white rounded-xl text-sm font-bold hover:bg-[#004182] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-200"
+                        >
+                            Linkedin Profiline Git
+                            <ExternalLink size={16} />
+                        </a>
                     </div>
                 </div>
-                <p className="mt-4 text-[10px] text-gray-400 uppercase tracking-widest font-bold">LinkedIn Cached View</p>
+                <p className="mt-4 text-[10px] text-gray-400 uppercase tracking-widest font-bold opacity-60">LinkedIn Offline View</p>
             </div>
         );
     }
