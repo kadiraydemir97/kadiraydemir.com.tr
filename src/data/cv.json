@@ -1,0 +1,69 @@
+{
+    "profile": {
+        "name": "Kadir Aydemir",
+        "title": "Senior Full Stack Developer / Technical Lead",
+        "location": "Ankara, Türkiye",
+        "summary": "Experienced Senior Full Stack Developer (5+ years). Specialized in Java/Spring Boot, Kafka, React.js, Kubernetes. Strong background in banking and defense industries."
+    },
+    "skills": {
+        "languages": [
+            "Java",
+            "JavaScript",
+            "TypeScript",
+            "SQL"
+        ],
+        "frameworks": [
+            "Spring Boot",
+            "React.js",
+            "Hibernate",
+            "JUnit",
+            "Mockito"
+        ],
+        "infrastructure": [
+            "Docker",
+            "Kubernetes",
+            "Git",
+            "Jenkins",
+            "Apache Kafka",
+            "Redis"
+        ],
+        "concepts": [
+            "Microservices",
+            "CI/CD",
+            "REST APIs",
+            "Distributed Systems"
+        ]
+    },
+    "experience": [
+        {
+            "company": "Akbank",
+            "role": "Senior Software Developer",
+            "period": "June 2025 – Present",
+            "details": "Designing Java/Spring microservices for corporate modernization. Managing Kafka event streaming. Supporting Kubernetes production operations."
+        },
+        {
+            "company": "Garanti BBVA",
+            "role": "Senior Software Developer",
+            "period": "June 2024 – June 2025",
+            "details": "CRYPTECH / ARK project. Implemented secure REST APIs and Kafka systems. Performance tuning."
+        },
+        {
+            "company": "Aselsan",
+            "role": "Technical Lead / Full Stack Developer",
+            "period": "Aug 2020 – June 2024",
+            "details": "YAKUD Project Technical Owner. Designed architecture from scratch. Led 4-8 member team. Managed full SDLC."
+        }
+    ],
+    "education": [
+        {
+            "school": "Istanbul Aydin University",
+            "degree": "B.Sc. Computer Engineering",
+            "gpa": "3.76/4.00"
+        },
+        {
+            "school": "University of Łomża (Poland)",
+            "degree": "Exchange Program",
+            "gpa": "5.0/5.0"
+        }
+    ]
+}
