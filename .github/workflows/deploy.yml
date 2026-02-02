@@ -28,8 +28,11 @@ jobs:
             
             echo "Rebuilding and restarting Docker containers..."
             echo "Rebuilding and restarting Docker containers..."
-            # Using Docker Compose v2 (Preferred)
-            docker compose up -d --build
+            # Force cleanup of old containers
+            docker compose down --remove-orphans || true
+            
+            # Start fresh
+            docker compose up -d --build --force-recreate
             
             echo "Cleaning up unused images..."
             docker image prune -f
