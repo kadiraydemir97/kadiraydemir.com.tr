@@ -120,23 +120,29 @@ export const MinesweeperGame = () => {
         }
 
         const newGrid = grid.map(r => r.map(c => ({ ...c })));
-        newGrid[row][col].state = 'revealed';
+        const stack: [number, number][] = [[row, col]];
 
-        // If no neighbor mines, reveal neighbors recursively
-        if (newGrid[row][col].neighborMines === 0 && !newGrid[row][col].isMine) {
-            for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                    if (dr !== 0 || dc !== 0) {
-                        const newRow = row + dr;
-                        const newCol = col + dc;
-                        if (
-                            newRow >= 0 &&
-                            newRow < config.rows &&
-                            newCol >= 0 &&
-                            newCol < config.cols &&
-                            newGrid[newRow][newCol].state === 'hidden'
-                        ) {
-                            return revealCell(newGrid, newRow, newCol);
+        while (stack.length > 0) {
+            const [currRow, currCol] = stack.pop()!;
+
+            if (
+                currRow < 0 ||
+                currRow >= config.rows ||
+                currCol < 0 ||
+                currCol >= config.cols ||
+                newGrid[currRow][currCol].state !== 'hidden'
+            ) {
+                continue;
+            }
+
+            newGrid[currRow][currCol].state = 'revealed';
+
+            // If no neighbor mines, reveal neighbors
+            if (newGrid[currRow][currCol].neighborMines === 0 && !newGrid[currRow][currCol].isMine) {
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        if (dr !== 0 || dc !== 0) {
+                            stack.push([currRow + dr, currCol + dc]);
                         }
                     }
                 }
