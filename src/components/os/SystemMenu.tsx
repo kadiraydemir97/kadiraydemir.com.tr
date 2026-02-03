@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useOSStore } from '../../store/useOSStore';
 import { useSystemStore } from '../../store/useSystemStore';
 import { useProcess } from '../../hooks/useProcess';
+import { useTranslation } from 'react-i18next';
 
 interface SystemMenuProps {
     isOpen: boolean;
@@ -20,6 +21,7 @@ export const SystemMenu = ({ isOpen, onClose }: SystemMenuProps) => {
     } = useSystemStore();
 
     const { openSettings } = useProcess();
+    const { t } = useTranslation();
 
     const handlePowerOff = () => {
         setBootState('off');
@@ -66,29 +68,29 @@ export const SystemMenu = ({ isOpen, onClose }: SystemMenuProps) => {
                         <div className="grid grid-cols-2 gap-2 mb-6">
                             <QuickTile
                                 icon={<Wifi size={18} />}
-                                label="Wi-Fi"
+                                label={t('system.wifi')}
                                 active={isWifiOn}
                                 onClick={toggleWifi}
-                                sublabel={isWifiOn ? "Aydemir_Home" : "Off"}
+                                sublabel={isWifiOn ? "Aydemir_Home" : t('system.off')}
                             />
                             <QuickTile
                                 icon={<Bluetooth size={18} />}
-                                label="Bluetooth"
+                                label={t('system.bluetooth')}
                                 active={isBluetoothOn}
                                 onClick={toggleBluetooth}
-                                sublabel={isBluetoothOn ? "On" : "Off"}
+                                sublabel={isBluetoothOn ? t('system.on') : t('system.off')}
                             />
                             <QuickTile
                                 icon={<Moon size={18} />}
-                                label="Night Light"
+                                label={t('system.nightLight')}
                                 active={isDarkMode}
                                 onClick={toggleDarkMode}
                             />
                             <QuickTile
                                 icon={<Zap size={18} />}
-                                label="Power Mode"
+                                label={t('system.powerMode')}
                                 active={true}
-                                sublabel="Balanced"
+                                sublabel={t('system.balanced')}
                             />
                         </div>
 
@@ -133,7 +135,7 @@ export const SystemMenu = ({ isOpen, onClose }: SystemMenuProps) => {
                             <button
                                 onClick={handleSettings}
                                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                                title="Settings"
+                                title={t('system.settings')}
                             >
                                 <Settings size={18} />
                             </button>
@@ -141,14 +143,14 @@ export const SystemMenu = ({ isOpen, onClose }: SystemMenuProps) => {
                                 <button
                                     onClick={handleLock}
                                     className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                                    title="Lock"
+                                    title={t('system.lock')}
                                 >
                                     <Lock size={18} />
                                 </button>
                                 <button
                                     onClick={handlePowerOff}
                                     className="p-2 hover:bg-white/10 rounded-full transition-colors text-red-400"
-                                    title="Power Off"
+                                    title={t('system.powerOff')}
                                 >
                                     <Power size={18} />
                                 </button>

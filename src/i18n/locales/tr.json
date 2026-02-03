@@ -1,0 +1,34 @@
+{
+  "apps": {
+    "cv": "Özgeçmiş",
+    "terminal": "Terminal",
+    "browser": "Tarayıcı",
+    "mail": "Posta",
+    "settings": "Ayarlar",
+    "minesweeper": "Mayın Tarlası",
+    "sudoku": "Sudoku",
+    "htop": "Htop",
+    "about": "Sistem Bilgisi"
+  },
+  "system": {
+    "wifi": "Wi-Fi",
+    "bluetooth": "Bluetooth",
+    "nightLight": "Gece Işığı",
+    "powerMode": "Güç Modu",
+    "settings": "Ayarlar",
+    "lock": "Kilitle",
+    "powerOff": "Kapat",
+    "on": "Açık",
+    "off": "Kapalı",
+    "balanced": "Dengeli",
+    "activities": "Etkinlikler",
+    "desktop": "KadirOS Masaüstü",
+    "applications": "Uygulamalar"
+  },
+  "applicationsMenu": {
+    "searchPlaceholder": "Ara...",
+    "frequent": "Sık Kullanılanlar",
+    "allApplications": "Tüm Uygulamalar",
+    "notFound": "Uygulama bulunamadı"
+  }
+}

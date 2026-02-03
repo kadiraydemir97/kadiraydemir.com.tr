@@ -2,6 +2,7 @@ import { Terminal, Settings, Globe, Mail, Bomb, Grid3x3, Search, Activity, Info 
 import { useProcess } from '../../hooks/useProcess';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ApplicationsMenuProps {
     isOpen: boolean;
@@ -39,11 +40,12 @@ const AppItem = ({ label, icon, onClick }: AppItemProps) => (
 );
 
 export const ApplicationsMenu = ({ isOpen, onClose }: ApplicationsMenuProps) => {
-    const { openTerminal, openSettings, openBrowser, openMail, openMinesweeper, openSudoku, openHtop } = useProcess();
+    const { openTerminal, openSettings, openBrowser, openMail, openMinesweeper, openSudoku, openHtop, openAbout } = useProcess();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'frequent' | 'all'>('frequent');
     const [currentPage, setCurrentPage] = useState(0);
     const ITEMS_PER_PAGE = 10;
+    const { t } = useTranslation();
 
     // Reset page when tab changes
     if (activeTab !== 'frequent' && currentPage !== 0 && activeTab === 'all') {
@@ -54,58 +56,58 @@ export const ApplicationsMenu = ({ isOpen, onClose }: ApplicationsMenuProps) => 
     const apps: App[] = [
         {
             id: 'terminal',
-            label: 'Terminal',
+            label: t('apps.terminal'),
             icon: <Terminal size={28} />,
             onClick: openTerminal,
             frequent: true
         },
         {
             id: 'browser',
-            label: 'Browser',
+            label: t('apps.browser'),
             icon: <Globe size={28} />,
             onClick: openBrowser,
             frequent: true
         },
         {
             id: 'mail',
-            label: 'Mail',
+            label: t('apps.mail'),
             icon: <Mail size={28} />,
             onClick: openMail,
             frequent: true
         },
         {
             id: 'minesweeper',
-            label: 'Minesweeper',
+            label: t('apps.minesweeper'),
             icon: <Bomb size={28} />,
             onClick: openMinesweeper,
             frequent: false
         },
         {
             id: 'sudoku',
-            label: 'Sudoku',
+            label: t('apps.sudoku'),
             icon: <Grid3x3 size={28} />,
             onClick: openSudoku,
             frequent: false
         },
         {
             id: 'settings',
-            label: 'Settings',
+            label: t('apps.settings'),
             icon: <Settings size={28} />,
             onClick: openSettings,
             frequent: false
         },
         {
             id: 'htop',
-            label: 'Htop',
+            label: t('apps.htop'),
             icon: <Activity size={28} />,
             onClick: openHtop,
             frequent: false
         },
         {
             id: 'about',
-            label: 'System Info',
+            label: t('apps.about'),
             icon: <Info size={28} />,
-            onClick: useProcess().openAbout,
+            onClick: openAbout,
             frequent: false
         }
     ];
@@ -158,7 +160,7 @@ export const ApplicationsMenu = ({ isOpen, onClose }: ApplicationsMenuProps) => 
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
                                 <input
                                     type="text"
-                                    placeholder="Type to search..."
+                                    placeholder={t('applicationsMenu.searchPlaceholder')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full bg-black/30 text-white placeholder-white/40 rounded-xl pl-12 pr-4 py-3 outline-none focus:ring-2 focus:ring-ubuntu-orange/50 transition-all font-ubuntu"
@@ -176,7 +178,7 @@ export const ApplicationsMenu = ({ isOpen, onClose }: ApplicationsMenuProps) => 
                                     : 'text-white/50 hover:text-white/70'
                                     }`}
                             >
-                                Frequent
+                                {t('applicationsMenu.frequent')}
                                 {activeTab === 'frequent' && (
                                     <motion.div
                                         layoutId="activeTab"
@@ -191,7 +193,7 @@ export const ApplicationsMenu = ({ isOpen, onClose }: ApplicationsMenuProps) => 
                                     : 'text-white/50 hover:text-white/70'
                                     }`}
                             >
-                                All Applications
+                                {t('applicationsMenu.allApplications')}
                                 {activeTab === 'all' && (
                                     <motion.div
                                         layoutId="activeTab"
@@ -223,7 +225,7 @@ export const ApplicationsMenu = ({ isOpen, onClose }: ApplicationsMenuProps) => 
                                         ))
                                     ) : (
                                         <div className="col-span-5 text-center py-12 text-white/40 font-ubuntu">
-                                            No applications found
+                                            {t('applicationsMenu.notFound')}
                                         </div>
                                     )}
                                 </motion.div>

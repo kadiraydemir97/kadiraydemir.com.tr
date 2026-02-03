@@ -5,9 +5,11 @@ import { useOSStore } from '../../store/useOSStore';
 import { ApplicationsMenu } from './ApplicationsMenu';
 import { SystemMenu } from './SystemMenu';
 import { CalendarPopup } from './CalendarPopup';
+import { LanguageSelector } from './LanguageSelector';
 import { useSystemStore } from '../../store/useSystemStore';
 import { useState, useMemo } from 'react';
 import { Wifi } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // App icon mapping
 const getAppIcon = (appType: string) => {
@@ -31,36 +33,24 @@ const getAppIcon = (appType: string) => {
     }
 };
 
-const getAppName = (appType: string) => {
-    switch (appType) {
-        case 'cv': return 'CV';
-        case 'terminal': return 'Terminal';
-        case 'browser': return 'Browser';
-        case 'mail': return 'Mail';
-        case 'settings': return 'Settings';
-        case 'minesweeper': return 'Minesweeper';
-        case 'sudoku': return 'Sudoku';
-        default: return appType;
-    }
-};
-
 const TopBar = () => {
     const { formattedTime, fullDate } = useTime();
     const { windows, activeWindowId } = useOSStore();
     const { isWifiOn } = useSystemStore();
     const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const { t } = useTranslation();
 
     const activeAppTitle = useMemo(() => {
-        if (!activeWindowId) return 'KadirOS Desktop';
+        if (!activeWindowId) return t('system.desktop');
         const activeWindow = windows.find(w => w.id === activeWindowId);
-        return activeWindow ? getAppName(activeWindow.appType) : 'KadirOS Desktop';
-    }, [windows, activeWindowId]);
+        return activeWindow ? t(`apps.${activeWindow.appType}`) : t('system.desktop');
+    }, [windows, activeWindowId, t]);
 
     return (
         <div className="h-7 bg-ubuntu-header flex items-center justify-between px-2 text-sm select-none z-50 absolute top-0 w-full shadow-md text-gray-200">
             <div className="flex items-center gap-4 pl-2">
-                <span className="font-bold hover:bg-white/10 px-2 py-0.5 rounded cursor-pointer transition-colors font-ubuntu">Activities</span>
+                <span className="font-bold hover:bg-white/10 px-2 py-0.5 rounded cursor-pointer transition-colors font-ubuntu">{t('system.activities')}</span>
                 <span className="hover:bg-white/10 px-2 py-0.5 rounded cursor-pointer transition-colors hidden sm:block font-ubuntu">
                     {activeAppTitle}
                 </span>
@@ -80,6 +70,8 @@ const TopBar = () => {
                         onClose={() => setIsCalendarOpen(false)}
                     />
                 </div>
+
+                <LanguageSelector />
 
                 <div
                     className="flex items-center gap-2 hover:bg-white/10 px-2 py-0.5 rounded cursor-pointer transition-colors"
@@ -119,6 +111,7 @@ export const Taskbar = () => {
     const { toggleCV, toggleTerminal, toggleBrowser, toggleMail, toggleSettings, toggleMinesweeper, toggleSudoku } = useProcess();
     const { windows } = useOSStore();
     const [isAppsMenuOpen, setIsAppsMenuOpen] = useState(false);
+    const { t } = useTranslation();
 
     const isAppOpen = (type: string) => windows.some(w => w.appType === type);
 
@@ -149,13 +142,13 @@ export const Taskbar = () => {
                     icon={<FileText className="text-orange-400" size={28} />}
                     onClick={toggleCV}
                     isOpen={isAppOpen('cv')}
-                    name="CV"
+                    name={t('apps.cv')}
                 />
                 <DockItem
                     icon={<Globe className="text-blue-400" size={28} />}
                     onClick={toggleBrowser}
                     isOpen={isAppOpen('browser')}
-                    name="Browser"
+                    name={t('apps.browser')}
                 />
 
                 {/* Separator - Only show if there are non-pinned apps open */}
@@ -172,7 +165,7 @@ export const Taskbar = () => {
                             icon={getAppIcon(appType)}
                             onClick={getToggleFunction(appType)}
                             isOpen={isAppOpen(appType)}
-                            name={getAppName(appType)}
+                            name={t(`apps.${appType}`)}
                         />
                     ))}
 
@@ -180,7 +173,7 @@ export const Taskbar = () => {
                     <DockItem
                         icon={<Grid className="text-white" size={24} />}
                         onClick={() => setIsAppsMenuOpen(!isAppsMenuOpen)}
-                        name="Applications"
+                        name={t('system.applications')}
                     />
                 </div>
             </div>
