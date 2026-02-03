@@ -37,7 +37,7 @@ export const Desktop = () => {
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="absolute inset-0 z-0 pt-10 pl-16 pr-4 pb-4 grid grid-flow-col auto-rows-[100px] content-start gap-4"
+            className="absolute inset-0 z-0 pt-10 pl-4 pr-4 pb-20 md:pl-16 md:pb-4 grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] md:grid-flow-col md:auto-rows-[100px] md:grid-cols-none content-start gap-4"
             style={{
                 backgroundImage: `url(${backgroundImage})`,
                 backgroundSize: 'cover',

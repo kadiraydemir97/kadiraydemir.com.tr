@@ -30,12 +30,14 @@ export const useOSStore = create<OSState>((set, get) => ({
             return;
         }
 
+        const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+
         const newWindow: WindowState = {
             id: crypto.randomUUID(),
             appType,
             title,
             isMinimized: false,
-            isMaximized: false,
+            isMaximized: isMobile,
             zIndex: START_Z_INDEX + windows.length + 1,
             position: { x: 100 + (windows.length * 30), y: 60 + (windows.length * 30) }, // Moved further right and down
             size: DEFAULT_WINDOW_SIZE,

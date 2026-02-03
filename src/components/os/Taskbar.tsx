@@ -102,9 +102,9 @@ const TopBar = () => {
 };
 
 const DockItem = ({ icon, onClick, isOpen, name }: { icon: React.ReactNode, onClick: () => void, isOpen?: boolean, name: string }) => (
-    <div className="relative group w-full aspect-square flex items-center justify-center cursor-pointer" onClick={onClick}>
+    <div className="relative group w-12 h-12 md:w-full md:h-auto md:aspect-square flex items-center justify-center cursor-pointer" onClick={onClick}>
         {isOpen && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1 bg-ubuntu-orange rounded-full" />
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 md:left-0 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:bottom-auto bg-ubuntu-orange rounded-full" />
         )}
         <div className="p-2.5 bg-gray-800/50 rounded-xl group-hover:bg-white/10 transition-colors">
             {icon}
@@ -143,8 +143,8 @@ export const Taskbar = () => {
         <>
             <TopBar />
 
-            {/* Left Dock */}
-            <div className="absolute left-0 top-7 bottom-0 w-16 bg-ubuntu-dock/80 backdrop-blur-md flex flex-col items-center py-2 gap-2 z-40 border-r border-white/5">
+            {/* Dock (Left on Desktop, Bottom on Mobile) */}
+            <div className="absolute bottom-0 left-0 right-0 md:top-7 md:bottom-0 md:w-16 md:right-auto h-16 md:h-auto bg-ubuntu-dock/80 backdrop-blur-md flex flex-row md:flex-col items-center px-4 md:px-0 md:py-2 gap-2 z-40 border-t md:border-t-0 md:border-r border-white/5">
                 {/* Pinned Apps - Always visible */}
                 <DockItem
                     icon={<FileText className="text-orange-400" size={28} />}
@@ -177,7 +177,7 @@ export const Taskbar = () => {
                         />
                     ))}
 
-                <div className="mt-auto mb-2">
+                <div className="ml-auto md:ml-0 md:mt-auto md:mb-2">
                     <DockItem
                         icon={<Grid className="text-white" size={24} />}
                         onClick={() => setIsAppsMenuOpen(!isAppsMenuOpen)}

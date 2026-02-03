@@ -4,6 +4,7 @@ import { X, Minus, Square, Maximize2 } from 'lucide-react';
 import { useOSStore } from '../../store/useOSStore';
 import { WindowState } from '../../types/os';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface WindowFrameProps {
     window: WindowState;
@@ -16,6 +17,7 @@ export const WindowFrame = ({ window, children }: WindowFrameProps) => {
     const nodeRef = useRef<HTMLDivElement>(null);
     const [dragPosition, setDragPosition] = useState(position);
     const isActive = activeWindowId === id;
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         setDragPosition(position);
@@ -31,27 +33,29 @@ export const WindowFrame = ({ window, children }: WindowFrameProps) => {
         updateWindowPosition(id, { x: data.x, y: data.y });
     };
 
+    const effectiveIsMaximized = isMobile || isMaximized;
+
     return (
         <Draggable
             nodeRef={nodeRef}
             handle=".window-header"
-            position={isMaximized ? { x: 0, y: 0 } : dragPosition}
+            position={effectiveIsMaximized ? { x: 0, y: 0 } : dragPosition}
             onDrag={handleDrag}
             onStop={handleStop}
             onStart={() => focusWindow(id)}
-            disabled={isMaximized}
+            disabled={effectiveIsMaximized}
             bounds="parent"
         >
             <div
                 ref={nodeRef}
                 onMouseDownCapture={() => focusWindow(id)}
-                className={`absolute flex flex-col bg-ubuntu-cool-grey shadow-2xl overflow-hidden border border-black/50 transition-all duration-200 ease-in-out ${isMaximized ? 'rounded-none' : 'rounded-lg'} ${isActive ? 'ring-1 ring-white/20' : ''}`}
+                className={`absolute flex flex-col bg-ubuntu-cool-grey shadow-2xl overflow-hidden border border-black/50 transition-all duration-200 ease-in-out ${effectiveIsMaximized ? 'rounded-none' : 'rounded-lg'} ${isActive ? 'ring-1 ring-white/20' : ''}`}
                 style={{
-                    width: isMaximized ? 'calc(100vw - 64px)' : size.width,
-                    height: isMaximized ? 'calc(100vh - 28px)' : size.height,
+                    width: effectiveIsMaximized ? (isMobile ? '100vw' : 'calc(100vw - 64px)') : size.width,
+                    height: effectiveIsMaximized ? (isMobile ? 'calc(100vh - 28px - 64px)' : 'calc(100vh - 28px)') : size.height,
                     zIndex: zIndex,
-                    top: isMaximized ? '28px' : 0,
-                    left: isMaximized ? '64px' : 0,
+                    top: effectiveIsMaximized ? '28px' : 0,
+                    left: effectiveIsMaximized ? (isMobile ? 0 : '64px') : 0,
                     pointerEvents: 'auto',
                 }}
             >
@@ -59,7 +63,7 @@ export const WindowFrame = ({ window, children }: WindowFrameProps) => {
                 <div
                     data-testid="window-header"
                     className="window-header h-9 bg-ubuntu-header flex items-center justify-between px-3 cursor-default select-none group shrink-0"
-                    onDoubleClick={() => isMaximized ? restoreWindow(id) : maximizeWindow(id)}
+                    onDoubleClick={() => !isMobile && (isMaximized ? restoreWindow(id) : maximizeWindow(id))}
                 >
                     <div className="flex-1 text-center text-sm font-bold text-gray-300 pointer-events-none">
                         {title}
@@ -73,16 +77,18 @@ export const WindowFrame = ({ window, children }: WindowFrameProps) => {
                         >
                             <Minus size={12} />
                         </button>
-                        <button
-                            data-testid="window-maximize"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                isMaximized ? restoreWindow(id) : maximizeWindow(id);
-                            }}
-                            className="w-5 h-5 rounded-full bg-ubuntu-warm-grey/20 hover:bg-ubuntu-warm-grey/50 flex items-center justify-center text-white transition-colors"
-                        >
-                            {isMaximized ? <Maximize2 size={10} /> : <Square size={10} />}
-                        </button>
+                        {!isMobile && (
+                            <button
+                                data-testid="window-maximize"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    isMaximized ? restoreWindow(id) : maximizeWindow(id);
+                                }}
+                                className="w-5 h-5 rounded-full bg-ubuntu-warm-grey/20 hover:bg-ubuntu-warm-grey/50 flex items-center justify-center text-white transition-colors"
+                            >
+                                {isMaximized ? <Maximize2 size={10} /> : <Square size={10} />}
+                            </button>
+                        )}
                         <button
                             data-testid="window-close"
                             onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
