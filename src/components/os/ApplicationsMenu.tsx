@@ -150,7 +150,7 @@ export const ApplicationsMenu = ({ isOpen, onClose }: ApplicationsMenuProps) => 
                         animate={{ opacity: 1, scale: 1, x: "-50%" }}
                         exit={{ opacity: 0, scale: 0.95, x: "-50%" }}
                         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                        className="fixed bottom-48 left-1/2 w-[720px] bg-gradient-to-br from-gray-900/98 to-gray-800/98 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden"
+                        className="fixed bottom-20 md:bottom-48 left-1/2 w-[90vw] md:w-[720px] bg-gradient-to-br from-gray-900/98 to-gray-800/98 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden"
                     >
                         {/* Search Bar */}
                         <div className="p-6 pb-4">
@@ -210,7 +210,7 @@ export const ApplicationsMenu = ({ isOpen, onClose }: ApplicationsMenuProps) => 
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="p-6 grid grid-cols-5 gap-4 absolute inset-0 content-start"
+                                    className="p-6 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 absolute inset-0 content-start"
                                 >
                                     {paginatedApps.length > 0 ? (
                                         paginatedApps.map((app) => (

@@ -4,6 +4,7 @@ import { X, Minus, Square, Maximize2 } from 'lucide-react';
 import { useOSStore } from '../../store/useOSStore';
 import { WindowState } from '../../types/os';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface WindowFrameProps {
     window: WindowState;
@@ -16,6 +17,7 @@ export const WindowFrame = ({ window, children }: WindowFrameProps) => {
     const nodeRef = useRef<HTMLDivElement>(null);
     const [dragPosition, setDragPosition] = useState(position);
     const isActive = activeWindowId === id;
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         setDragPosition(position);
@@ -47,11 +49,11 @@ export const WindowFrame = ({ window, children }: WindowFrameProps) => {
                 onMouseDownCapture={() => focusWindow(id)}
                 className={`absolute flex flex-col bg-ubuntu-cool-grey shadow-2xl overflow-hidden border border-black/50 transition-all duration-200 ease-in-out ${isMaximized ? 'rounded-none' : 'rounded-lg'} ${isActive ? 'ring-1 ring-white/20' : ''}`}
                 style={{
-                    width: isMaximized ? 'calc(100vw - 64px)' : size.width,
-                    height: isMaximized ? 'calc(100vh - 28px)' : size.height,
+                    width: isMaximized ? (isMobile ? '100vw' : 'calc(100vw - 64px)') : size.width,
+                    height: isMaximized ? (isMobile ? 'calc(100vh - 28px - 64px)' : 'calc(100vh - 28px)') : size.height,
                     zIndex: zIndex,
                     top: isMaximized ? '28px' : 0,
-                    left: isMaximized ? '64px' : 0,
+                    left: isMaximized ? (isMobile ? 0 : '64px') : 0,
                     pointerEvents: 'auto',
                 }}
             >
