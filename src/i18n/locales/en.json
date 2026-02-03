@@ -1,0 +1,34 @@
+{
+  "apps": {
+    "cv": "CV",
+    "terminal": "Terminal",
+    "browser": "Browser",
+    "mail": "Mail",
+    "settings": "Settings",
+    "minesweeper": "Minesweeper",
+    "sudoku": "Sudoku",
+    "htop": "Htop",
+    "about": "System Info"
+  },
+  "system": {
+    "wifi": "Wi-Fi",
+    "bluetooth": "Bluetooth",
+    "nightLight": "Night Light",
+    "powerMode": "Power Mode",
+    "settings": "Settings",
+    "lock": "Lock",
+    "powerOff": "Power Off",
+    "on": "On",
+    "off": "Off",
+    "balanced": "Balanced",
+    "activities": "Activities",
+    "desktop": "KadirOS Desktop",
+    "applications": "Applications"
+  },
+  "applicationsMenu": {
+    "searchPlaceholder": "Type to search...",
+    "frequent": "Frequent",
+    "allApplications": "All Applications",
+    "notFound": "No applications found"
+  }
+}
