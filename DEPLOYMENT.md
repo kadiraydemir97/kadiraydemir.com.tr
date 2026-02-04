@@ -42,7 +42,7 @@ Once installed, access your dashboard at:
 3.  **Create New Resource:**
     *   Go to **Projects** -> **Default** (or create new).
     *   Click **+ New Resource** -> **Public Repository** or **Private Repository**.
-    *   Select your repository: `kadiraydemir97/kadiraydemir.com.tr`.
+    *   Select your repository: `KadirAydemir/kadiraydemir.com.tr`.
 4.  **Configuration:**
     *   **Build Pack:** Select `Docker Compose` or `Nginx` (Coolify will detect the `Dockerfile` or `docker-compose.yml`).
     *   **Domains:** Enter `https://kadiraydemir.com.tr`. Coolify will automatically generate the SSL certificate and configure the reverse proxy.
