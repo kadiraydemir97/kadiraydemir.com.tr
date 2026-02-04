@@ -123,8 +123,16 @@ export const Desktop = () => {
     };
 
     const handleRenameSubmit = async () => {
-        if (selectedItem && renameValue.trim() && renameValue.trim() !== selectedItem.name) {
-            await renameItem(selectedItem.id, renameValue.trim());
+        if (selectedItem && renameValue.trim()) {
+            let newName = renameValue.trim();
+
+            if (selectedItem.extension === 'txt' && !newName.toLowerCase().endsWith('.txt')) {
+                newName += '.txt';
+            }
+
+            if (newName !== selectedItem.name) {
+                await renameItem(selectedItem.id, newName);
+            }
         }
         setRenamingId(null);
     };

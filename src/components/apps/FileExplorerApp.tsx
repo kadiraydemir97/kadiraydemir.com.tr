@@ -78,7 +78,7 @@ export const FileExplorerApp = ({ initialPath }: FileExplorerProps) => {
     useEffect(() => {
         const fetchRepos = async () => {
             try {
-                const response = await fetch('https://api.github.com/users/KadirAydemir/repos?sort=updated');
+                const response = await fetch('https://api.github.com/users/kadiraydemir97/repos?sort=updated');
                 if (response.ok) {
                     const data = await response.json();
                     const repoFiles: FileSystemItem[] = data.map((repo: any) => ({

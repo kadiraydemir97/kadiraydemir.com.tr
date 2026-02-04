@@ -23,7 +23,7 @@ export const ProjectsApp = () => {
     useEffect(() => {
         const fetchRepos = async () => {
             try {
-                const response = await fetch('https://api.github.com/users/KadirAydemir/repos?sort=updated');
+                const response = await fetch('https://api.github.com/users/kadiraydemir97/repos?sort=updated');
                 if (!response.ok) {
                     throw new Error('Failed to fetch repositories');
                 }
@@ -79,7 +79,7 @@ export const ProjectsApp = () => {
                         <Github size={24} />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-gray-900 leading-none mb-1">KadirAydemir</h1>
+                        <h1 className="text-xl font-bold tracking-tight text-gray-900 leading-none mb-1">kadiraydemir97</h1>
                         <p className="text-xs text-gray-500 font-medium">GitHub Repositories</p>
                     </div>
                 </div>
