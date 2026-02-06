@@ -1,5 +1,5 @@
 import { FolderOpen, RotateCcw, Trash2, Edit2, Trash, FolderPlus, FilePlus, Terminal } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProcess } from '../../hooks/useProcess';
 import { useOSStore } from '../../store/useOSStore';
@@ -15,7 +15,7 @@ interface FileExplorerProps {
 
 export const FileExplorerApp = ({ initialPath }: FileExplorerProps) => {
     const { t } = useTranslation();
-    const { openCV, openWindow } = useProcess();
+    const { openWindow } = useProcess();
     const { fileSystem, createItem, deleteItem, renameItem, restoreItem, emptyTrash, showConfirm } = useOSStore();
     const [currentPath, setCurrentPath] = useState<string[]>(initialPath || ['home']);
     const [githubFiles, setGithubFiles] = useState<FileSystemItem[]>([]);
@@ -57,14 +57,14 @@ export const FileExplorerApp = ({ initialPath }: FileExplorerProps) => {
     const [history, setHistory] = useState<string[][]>([['home']]);
     const [historyIndex, setHistoryIndex] = useState(0);
 
-    const navigateTo = (path: string[]) => {
+    const navigateTo = useCallback((path: string[]) => {
         setCurrentPath(path);
         setSelectedItem(null);
         const newHistory = history.slice(0, historyIndex + 1);
         newHistory.push(path);
         setHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
-    };
+    }, [history, historyIndex]);
 
     const getCurrentFolder = (): FileSystemItem | null => {
         // Special case for projects folder - check the full path
@@ -129,17 +129,17 @@ export const FileExplorerApp = ({ initialPath }: FileExplorerProps) => {
         setRenamingId(null);
     };
 
-    const handleDoubleClick = (item: FileSystemItem) => {
+    const handleDoubleClick = useCallback((item: FileSystemItem) => {
         if (item.type === 'folder') {
             navigateTo([...currentPath, item.id]);
         } else if (item.url) {
             window.open(item.url, '_blank');
         } else if (item.extension === 'pdf') {
-            openCV();
+            openWindow('cv', 'Kadir Aydemir - CV');
         } else if (item.extension === 'txt') {
             openWindow('editor', item.name, { fileId: item.id });
         }
-    };
+    }, [currentPath, navigateTo, openWindow]);
 
     const getBreadcrumb = () => {
         const crumbs: { id: string; name: string; path: string[] }[] = [];
@@ -184,7 +184,7 @@ export const FileExplorerApp = ({ initialPath }: FileExplorerProps) => {
         setContextMenu({ x: e.clientX, y: e.clientY, isOpen: true });
     };
 
-    const menuItems = (() => {
+    const menuItems = useMemo(() => {
         const isInTrash = currentPath.includes('trash');
         const items: ContextMenuItem[] = [];
 
@@ -313,7 +313,7 @@ export const FileExplorerApp = ({ initialPath }: FileExplorerProps) => {
         }
 
         return items;
-    })();
+    }, [currentPath, selectedItem, t, handleDoubleClick, openWindow, restoreItem, createItem, deleteItem, emptyTrash, showConfirm]);
 
     return (
         <div className="w-full h-full bg-white text-gray-800 flex flex-col overflow-hidden"
