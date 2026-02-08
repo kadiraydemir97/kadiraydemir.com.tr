@@ -15,6 +15,7 @@ describe('useOSStore Performance Benchmark', () => {
                 id: 'root',
                 name: 'root',
                 type: 'folder',
+                modified: '2023-01-01',
                 children: [{
                     id: 'test-file',
                     name: 'test.txt',
@@ -25,7 +26,7 @@ describe('useOSStore Performance Benchmark', () => {
             }
         });
 
-        originalLocalStorage = global.localStorage;
+        originalLocalStorage = globalThis.localStorage;
 
         // Mock localStorage with a slow setItem
         const slowLocalStorage = {
@@ -43,7 +44,7 @@ describe('useOSStore Performance Benchmark', () => {
             key: vi.fn(),
         };
 
-        Object.defineProperty(global, 'localStorage', {
+        Object.defineProperty(globalThis, 'localStorage', {
             value: slowLocalStorage,
             writable: true
         });
@@ -51,7 +52,7 @@ describe('useOSStore Performance Benchmark', () => {
 
     afterEach(() => {
         // Restore localStorage
-        Object.defineProperty(global, 'localStorage', {
+        Object.defineProperty(globalThis, 'localStorage', {
             value: originalLocalStorage,
             writable: true
         });
